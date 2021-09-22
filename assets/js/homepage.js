@@ -47,7 +47,7 @@ let getUserRepos = function (user) {
       alert("Unable to connect to Github");
     });
 
-  //Create a function to DISPLAY THE REPOS, you are looking for a searchterm called "name".
+  //Create a function to DISPLAY THE REPOS, you are looking for a searchTerm called "name".
   let displayRepos = function (repos, searchTerm) {
     console.log(repos);
     console.log(searchTerm);
@@ -66,12 +66,12 @@ let getUserRepos = function (user) {
       //format repo name
       var repoName = repos[i].owner.login + "/" + repos[i].name;
 
-      //Create a container for each repo in the DOM and also styles it:
+      //Create a container for each repo in the DOM and also style it:
       let repoEl = document.createElement("div");
       repoEl.classList =
         "list-item flex-row justify-space-between align center";
 
-      //Create a span element to hol the repository name:
+      //Create a span element to hold the repository name:
       let titleEl = document.createElement("span");
       titleEl.textContent = repoName;
 
