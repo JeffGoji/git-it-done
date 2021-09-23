@@ -1,111 +1,135 @@
-//query selector for userform on html page
-const userFormEl = document.querySelector("#user-form");
-//query selector for username on html page
-const nameInputEl = document.querySelector("#username");
-//Variables to refference DOM events to the HTML page:
-const repoContainerEl = document.querySelector("#repos-container");
-const repoSearchTerm = document.querySelector("#repo-search-term");
+var userFormEl = document.querySelector("#user-form");
+var languageButtonsEl = document.querySelector("#language-buttons");
+var nameInputEl = document.querySelector("#username");
+var repoContainerEl = document.querySelector("#repos-container");
+var repoSearchTerm = document.querySelector("#repo-search-term");
 
-let formSubmitHandler = function (event) {
+var formSubmitHandler = function (event) {
+  // prevent page from refreshing
   event.preventDefault();
-  //Console log firs tto make sure stuff works before proceeding: console.log(event);
 
-  //get value from input element:
-  let username = nameInputEl.value.trim();
+  // get value from input element
+  var username = nameInputEl.value.trim();
 
   if (username) {
     getUserRepos(username);
+
+    // clear old content
+    repoContainerEl.textContent = "";
     nameInputEl.value = "";
   } else {
-    alert("Please enter a GitHub Username");
+    alert("Please enter a GitHub username");
+  }
+};
+
+var buttonClickHandler = function (event) {
+  // get the language attribute from the clicked element
+  var language = event.target.getAttribute("data-language");
+
+  if (language) {
+    getFeaturedRepos(language);
+
+    // clear old content
+    repoContainerEl.textContent = "";
   }
 };
 
 var getUserRepos = function (user) {
-  //Format the github api url:
-  let apiUrl = "https://api.github.com/users/" + user + "/repos";
+  // format the github api url
+  var apiUrl = "https://api.github.com/users/" + user + "/repos";
 
-  //Make a request to the URL:
+  // make a get request to url
   fetch(apiUrl)
     .then(function (response) {
-      //If/else statement for if response ok display data, else display error message:
+      // request was successful
       if (response.ok) {
+        console.log(response);
         response.json().then(function (data) {
-          //This logs the data and user to the console:
-          console.log(user, data);
-          //Displays the data and user on the page:
+          console.log(data);
           displayRepos(data, user);
         });
       } else {
-        alert("Error: Github User Not Found");
+        alert("Error: " + response.statusText);
       }
     })
-
-    //If connectivity issues displays message:
     .catch(function (error) {
-      //Notice, this '.catch () getting chained onto the end of the '.then()
-      alert("Unable to connect to Github");
+      alert("Unable to connect to GitHub");
     });
-
-  //Create a function to DISPLAY THE REPOS, you are looking for a searchTerm called "name".
-  let displayRepos = function (repos, searchTerm) {
-    console.log(repos);
-    console.log(searchTerm);
-    //Clears old content:
-    repoContainerEl.textContent = "";
-    repoSearchTerm.textContent = searchTerm;
-
-    //Check if the API returned any repos:
-    if (repos.length === 0) {
-      repoContainerEl.textContent = "No Repositories Found.";
-      return;
-    }
-
-    //Loop over repos with a For loop
-    for (let i = 0; i < repos.length; i++) {
-      //format repo name
-      let repoName = repos[i].owner.login + "/" + repos[i].name;
-
-      //Create a container for each repo in the DOM and also style it:
-      let repoEl = document.createElement("a");
-      repoEl.classList =
-        "list-item flex-row justify-space-between align center";
-      //add the "a" attribute:
-      repoEl.setAttribute("href", "./single-repo.html?repo=" + repoName);
-
-      //Create a span element to hold the repository name:
-      let titleEl = document.createElement("span");
-      titleEl.textContent = repoName;
-
-      //Append the above to a container:
-      repoEl.appendChild(titleEl);
-
-      //added this last to display a little icon next to the number of issues to help indentify which repositories need help.
-      //Create a status element:
-      let statusEl = document.createElement("span");
-      statusEl.classList = "flex-row align-center";
-
-      //Check if the current repo has issues or not:
-      if (repos[i].open_issues_count > 0) {
-        //danger icon displayed
-        statusEl.innerHTML =
-          "<i class='fas fa-times status-icon icon-danger'></i>" +
-          repos[i].open_issues_count +
-          "issue(s)";
-      } else {
-        //Success icon displayed
-        statusEl.innerHTML =
-          "<i class='fas fa-check-square status-icon icon-success'></i>";
-      }
-
-      //Append the above statusEl icons to the container:
-      repoEl.appendChild(statusEl);
-
-      //Append the container to the DOM:
-      repoContainerEl.appendChild(repoEl);
-    }
-  };
 };
+
+var getFeaturedRepos = function (language) {
+  // format the github api url
+  var apiUrl =
+    "https://api.github.com/search/repositories?q=" +
+    language +
+    "+is:featured&sort=help-wanted-issues";
+
+  // make a get request to url
+  fetch(apiUrl).then(function (response) {
+    // request was successful
+    if (response.ok) {
+      response.json().then(function (data) {
+        displayRepos(data.items, language);
+      });
+    } else {
+      alert("Error: " + response.statusText);
+    }
+  });
+};
+
+var displayRepos = function (repos, searchTerm) {
+  // check if api returned any repos
+  if (repos.length === 0) {
+    repoContainerEl.textContent = "No repositories found.";
+    return;
+  }
+
+  repoSearchTerm.textContent = searchTerm;
+
+  // loop over repos
+  for (var i = 0; i < repos.length; i++) {
+    // format repo name
+    var repoName = repos[i].owner.login + "/" + repos[i].name;
+
+    // create a link for each repo
+    var repoEl = document.createElement("a");
+    repoEl.classList = "list-item flex-row justify-space-between align-center";
+    repoEl.setAttribute("href", "./single-repo.html?repo=" + repoName);
+
+    // create a span element to hold repository name
+    var titleEl = document.createElement("span");
+    titleEl.textContent = repoName;
+
+    // append to container
+    repoEl.appendChild(titleEl);
+
+    // create a status element
+    var statusEl = document.createElement("span");
+    statusEl.classList = "flex-row align-center";
+
+    // check if current repo has issues or not
+    if (repos[i].open_issues_count > 0) {
+      statusEl.innerHTML =
+        "<i class='fas fa-times status-icon icon-danger'></i>" +
+        repos[i].open_issues_count +
+        " issue(s)";
+    } else {
+      statusEl.innerHTML =
+        "<i class='fas fa-check-square status-icon icon-success'></i>";
+    }
+
+    // append to container
+    repoEl.appendChild(statusEl);
+
+    // append container to the dom
+    repoContainerEl.appendChild(repoEl);
+  }
+};
+
+// add event listeners to form and button container
+userFormEl.addEventListener("submit", formSubmitHandler);
+languageButtonsEl.addEventListener("click", buttonClickHandler);
+
 //Created a variable called response to fetch and display the info in the console log.
 //   let response = fetch("https://api.github.com/users/octocat/repos");
 //   console.log(response);
@@ -114,4 +138,6 @@ var getUserRepos = function (user) {
 //Insert GitHub username into the () below to see that user's github repositories.
 //getUserRepos("jeffgoji");
 
+// add event listeners to form and button container
 userFormEl.addEventListener("submit", formSubmitHandler);
+languageButtonsEl.addEventListener("click", buttonClickHandler);
