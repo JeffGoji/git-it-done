@@ -20,8 +20,14 @@ let getRepoIssues = function (repo) {
         }
       });
     } else {
+      //If not successful, redicrect to homepage:
       console.log(response);
-      alert("There was a problem with your request!");
+      //Alert first to tell them what is happening:
+      alert(
+        "There was a problem with your request! Sending you back to homepage"
+      );
+      // Send them back to homepage:
+      document.location.replace("./index.html");
     }
   });
 };
@@ -88,6 +94,15 @@ let getRepoName = function () {
   let repoName = queryString.split("=")[1];
   getRepoIssues(repoName);
   repoNameEl.textContent = repoName;
+  //Handle errors for correct query:
+  if (repoName) {
+    //displays repo name on teh page of query worked.
+    repoNameEl.textContent = repoName;
+    getRepoIssues(repoName);
+    //if no repor was given it will redirect to homepage:
+  } else {
+    document.location.replace("./index.html");
+  }
 };
 
 getRepoIssues(repoName);
