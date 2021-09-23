@@ -21,7 +21,7 @@ let formSubmitHandler = function (event) {
   }
 };
 
-let getUserRepos = function (user) {
+var getUserRepos = function (user) {
   //Format the github api url:
   let apiUrl = "https://api.github.com/users/" + user + "/repos";
 
@@ -71,7 +71,7 @@ let getUserRepos = function (user) {
       repoEl.classList =
         "list-item flex-row justify-space-between align center";
       //add the "a" attribute:
-      repoEl.setAttribute("href", "./single-repo.html");
+      repoEl.setAttribute("href", "./single-repo.html?repo=" + repoName);
 
       //Create a span element to hold the repository name:
       let titleEl = document.createElement("span");
