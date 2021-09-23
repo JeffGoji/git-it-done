@@ -64,12 +64,14 @@ let getUserRepos = function (user) {
     //Loop over repos with a For loop
     for (let i = 0; i < repos.length; i++) {
       //format repo name
-      var repoName = repos[i].owner.login + "/" + repos[i].name;
+      let repoName = repos[i].owner.login + "/" + repos[i].name;
 
       //Create a container for each repo in the DOM and also style it:
-      let repoEl = document.createElement("div");
+      let repoEl = document.createElement("a");
       repoEl.classList =
         "list-item flex-row justify-space-between align center";
+      //add the "a" attribute:
+      repoEl.setAttribute("href", "./single-repo.html");
 
       //Create a span element to hold the repository name:
       let titleEl = document.createElement("span");
